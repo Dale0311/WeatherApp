@@ -1,13 +1,18 @@
 import { WiHumidity } from 'react-icons/wi';
 import { GiWindSlap } from 'react-icons/gi';
 import { CiLocationOn } from 'react-icons/ci';
-
-import useCurrentWeather from '../hooks/useCurrentWeather';
-
+import { useContext } from 'react';
+import { CurrentWeatherContext } from '../context';
 const CurrentWeather = () => {
-  const { data, loading } = useCurrentWeather('Philippines');
+  const context = useContext(CurrentWeatherContext);
+  if (!context) {
+    return <h1 className="text-white text-xl">No Weather Data available</h1>;
+  }
+
+  const { data, error, loading } = context;
 
   if (loading) return <h1 className="text-3xl">Loading...</h1>;
+  if (error) return <h1 className="text-3xl">{error}</h1>;
 
   return (
     <div className="text-white font-title">
@@ -23,9 +28,9 @@ const CurrentWeather = () => {
           {' '}
           <CiLocationOn />
           <p>{data?.name}</p>
-          <p className="text-xs absolute bottom-0 right-[-20px]">
-            {data?.sys?.country}
-          </p>
+          <div className="text-xs absolute space-x-2 bottom-0 right-[-20px]">
+            <span>{data?.sys?.country}</span>
+          </div>
         </div>
         <p>{data?.weather[0]?.description}</p>
       </div>

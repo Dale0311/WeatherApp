@@ -2,16 +2,17 @@ import { useEffect, useState } from 'react';
 import { weatherApi, weatherGeoApi } from '../api/configAxios';
 import { TWeatherData } from '../types';
 
-export default function useCurrentWeather(q?: string) {
+export default function useCurrentWeather() {
   const [data, setData] = useState<TWeatherData | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const [q, setQ] = useState<string>('Tarlac, PH');
   // flow
   // 1. get the latitude and longitude using a state/country q search.
   // 2. if there is a corresponding latitude and longitude then use it to get current weather data.
-  const getCurrentWeather = async (q: string | undefined) => {
+  const getCurrentWeather = async () => {
     const appid = import.meta.env.VITE_APPID;
+
     setLoading(true);
     try {
       // send a request for the given location
@@ -41,27 +42,27 @@ export default function useCurrentWeather(q?: string) {
         },
       });
 
-      if (resWeatherData.status === 200) {
-        // if no data recieves
-        if (
-          !resWeatherData.data &&
-          Object.keys(resWeatherData.data).length === 0
-        ) {
-          const error = new Error('No data return');
-          error.name = 'NoData';
-          throw error;
-        }
-        setData(resWeatherData.data);
+      // if no data recieves
+      if (
+        !resWeatherData.data &&
+        Object.keys(resWeatherData.data).length === 0
+      ) {
+        const error = new Error('No data return');
+        error.name = 'NoData';
+        throw error;
       }
+      setData(resWeatherData.data);
     } catch (error) {
       setError('something went wrong');
     } finally {
       setLoading(false);
     }
   };
+
+  const refetch = (q: string) => setQ(q);
   useEffect(() => {
-    getCurrentWeather(q);
+    getCurrentWeather();
   }, [q]);
 
-  return { data, loading, error, getCurrentWeather };
+  return { data, loading, error, refetch };
 }
