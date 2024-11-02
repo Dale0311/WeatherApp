@@ -6,12 +6,14 @@ import { CurrentWeatherContext } from '../context';
 const CurrentWeather = () => {
   const context = useContext(CurrentWeatherContext);
   if (!context) {
-    return <h1 className="text-white text-xl">No Weather Data available</h1>;
+    return <h1 className="text-white text-xl">No Weather data available</h1>;
   }
 
   const { data, error, loading } = context;
 
-  if (loading) return <h1 className="text-3xl">Loading...</h1>;
+  if (loading) {
+    throw new Promise((resolve) => setTimeout(() => resolve, 5000));
+  }
   if (error) return <h1 className="text-3xl">{error}</h1>;
 
   return (
